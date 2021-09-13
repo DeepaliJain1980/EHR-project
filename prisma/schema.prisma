@@ -1,0 +1,194 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model OrganizationDetail {
+  id              Int     @id @default(autoincrement())
+  name            String
+  websiteLink     String?
+  linkedInPage    String?
+  email           String   
+  mobile          String
+  addressLine1    String
+  state           String
+  city            String
+  zipCode         Int   
+  employee        Employee[]
+}
+
+model Role {
+  id              Int             @id @default(autoincrement())
+  role            String          @unique
+  employee        Employee[]
+  department      Department[]
+}
+
+model Department {
+id             Int                @id @default(autoincrement())
+role           Role               @relation(fields: [roleName], references: [role]) 
+roleName       String
+department     String 
+@@unique([roleName, department])
+}
+
+
+model Employee {
+  id                      Int                @id @default(autoincrement())
+  name                    String
+  email                   String             @unique
+  role                    Role               @relation(fields: [roleName], references: [role])
+  roleName                String
+  department              String
+  dateOfCreation          DateTime            @default(now())
+  status                  String?
+  checklist               Checklist?          @relation(fields: [checklistName], references: [name])
+  checklistName           String?
+  organizationDetail      OrganizationDetail  @relation(fields: [organizationId], references: [id])
+  organizationId          Int
+  employeeDetail          EmployeeDetail?
+}
+
+
+
+model Checklist {
+  id                  Int                @id @default(autoincrement())
+  name                String             @unique
+  items               ChecklistItems[]
+  employee            Employee[]
+}
+
+
+
+model ChecklistItems {
+  checklist               Checklist          @relation(fields: [checklistName], references: [name])
+  checklistName           String
+  itemName                String
+  description             String?
+  mandatory               Boolean            @default(false)
+  requireUploadingFile    Boolean            @default(false)
+  
+  @@unique([checklistName, itemName])
+}
+
+model EmployeeDetail{
+email                   Employee        @relation(fields:[emailId], references: [email])
+emailId                 String          @id
+gender                  Gender          @default(MALE)
+mobile                  Int
+addressLine1            String
+state                   String
+city                    String
+zipCode                 Int?     
+bankAcNumber            Int?
+bankNumber              String?
+practiseLicNumber       String?
+licenseType             String?
+experience              String?
+specilities             String[]
+updatedAt               DateTime            @updatedAt
+empolyeeDoctor          Doctor?
+}
+
+
+model PatientDetail{
+id                      Int           @id @default(autoincrement())
+name                    String
+age                     Int
+gender                  Gender          @default(MALE)
+email                   String          @unique
+addressLine1            String
+state                   String
+city                    String
+zipCode                 Int?     
+bloodGroup              String
+height                  Float
+weight                  Float
+condition               String[]
+medication              String[]
+allergies               String[]
+vaccination             String[]
+visitNotes              VisitNotes[]
+patientCallLog          PatientCallLog[]
+updatedAt               DateTime            @updatedAt
+}
+
+model VisitNotes {
+patientDetail        PatientDetail         @relation(fields:[patientId], references: [id])
+patientId             Int
+date                 DateTime    
+detail                String?
+@@unique([patientId,date])
+}
+
+
+model PatientCallLog {
+id                    Int                   @id @default(autoincrement())
+patientDetail         PatientDetail         @relation(fields:[patientId], references: [id])
+patientId             Int                   
+callType              CallType?
+callTime              DateTime?         @default(now())
+callStatus            String?        
+}
+
+
+enum CallType {
+PHONE
+MESSAGE
+EMAIL
+CHAT
+VIDEO  
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+
+enum Weekday {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+model Doctor{
+id                    Int                   @id @default(autoincrement())
+employeeData          EmployeeDetail        @relation(fields:[emailId], references: [emailId])       
+emailId               String                @unique
+availability          Availability[]        
+}
+
+
+
+model Availability {
+id                    Int                   @id @default(autoincrement())
+email                 Doctor                @relation(fields:[emailId], references: [emailId]) 
+emailId               String
+weekday               Weekday?
+slot                  String[]
+}
+
+
+
+
+
+
+
+
+
+
+
+

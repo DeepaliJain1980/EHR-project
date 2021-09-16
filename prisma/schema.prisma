@@ -36,8 +36,10 @@ id             Int                @id @default(autoincrement())
 role           Role               @relation(fields: [roleName], references: [role]) 
 roleName       String
 department     String 
-@@unique([roleName, department])
+@@unique([roleName, department], name: "role_department")
 }
+
+
 
 
 model Employee {
@@ -46,13 +48,13 @@ model Employee {
   email                   String             @unique
   role                    Role               @relation(fields: [roleName], references: [role])
   roleName                String
-  department              String
+  department              String?
   dateOfCreation          DateTime            @default(now())
   status                  String?
   checklist               Checklist?          @relation(fields: [checklistName], references: [name])
   checklistName           String?
-  organizationDetail      OrganizationDetail  @relation(fields: [organizationId], references: [id])
-  organizationId          Int
+  organizationDetail      OrganizationDetail?  @relation(fields: [organizationId], references: [id])
+  organizationId          Int?
   employeeDetail          EmployeeDetail?
 }
 

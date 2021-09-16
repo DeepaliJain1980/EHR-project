@@ -1,1 +1,18 @@
 
+
+model Employee {
+  id                      Int                @id @default(autoincrement())
+  name                    String
+  email                   String             @unique
+  role                    Role               @relation(fields: [roleName], references: [role])
+  roleName                String
+  
+  departmentName          String
+  dateOfCreation          DateTime            @default(now())
+  status                  String?
+  checklist               Checklist?          @relation(fields: [checklistName], references: [name])
+  checklistName           String?
+  organizationDetail      OrganizationDetail?  @relation(fields: [organizationId], references: [id])
+  organizationId          Int?
+  employeeDetail          EmployeeDetail?
+}
